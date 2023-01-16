@@ -8,8 +8,13 @@ Autor:
 Christopher Amek Bazurto Mora
 
 Verisión:
-VER.1.0.0
+VER.1.0.1
 """
+from datetime import datetime
+from pymongo import MongoClient
+import random
+import string
+
 def validadorEnteros(num):
     """
     Es un procedimiento que nos determina si un dato ingresado(numero) es un digito
@@ -96,10 +101,139 @@ def menuPrincipal():
         else:
             print("Opcion ingresa no existe, intente de nuevo")
 
+def validate_words(words):
+    if isinstance(words, str):
+        word_list = words.split()
+        for word in word_list:
+            if not word.isalpha():
+                return False
+        return True
+    return False
+
+
+def validFecha(fecha):
+    try:
+        date = datetime.strptime(fecha, '%d-%m-%Y')
+        return True
+    except ValueError:
+        return False
+
+def validFechaActual(fecha):
+    try:
+        date = datetime.strptime(fecha, '%d-%m-%Y')
+        if date < datetime.now():
+            
+            return True
+        else:
+            return False
+    except ValueError:
+        return False
+def generarID():
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choice(characters) for _ in range(5))
+
+def validarFloat(numFloat):
+    #"""
+    #Es un procedimiento que nos determina si un dato ingresado(numero) es un flotante
+    #si lo es retorna un True(Verdadero) en caso de que no lo sea retorna un False(Falso)
+    #Parametros:
+    #------------
+    #    Tiene  un parámetro de entrada (numFloat)
+    #Retorna:
+    #------------
+    #    Retorna el valor de True si es el dato ingresado es un floatante y false si no lo es
+    #"""
+    #Si el numero es flotante
+	try:
+		float(numFloat)
+        #retorna true 
+		return True
+	except:
+        #En caso de excepción retorna false
+		return False
+
+def ingresoCantidad():
+    """
+    Es un procedimiento que nos permite ingresar la Cantidad de un rectangulo
+    Parametros:
+    ------------
+        No tiene  parámetro de entrada 
+    
+    Retorna:
+    ------------
+        Retorna numero flotante
+    """
+    #Bucle del ingreso de 
+    while True:
+        #Ingreso del dato 
+        print("\n--------------------------------------------------------------\n")
+        Cantidad = input("Ingrese la Cantidad del producto:  ")
+        print("\n--------------------------------------------------------------\n")
+        #si el dato ingresado es un flotante entonces
+        if validarFloat(Cantidad) == False:
+            #Imprime mensaje de error en ingreso de datos
+            print("--------------------------------------------------------------\n")
+            print("                              ERROR                           \n")
+            print("        El dato ingresado no es un numero, intente de nuevo   \n")
+            print("--------------------------------------------------------------\n") 
+        else:
+            #si el numero es flotante y >0
+            if float(Cantidad) > 0:
+                #retorna el numero
+                return Cantidad
+            else:
+                #Imprime mensaje de error en ingreso de datos
+                print("--------------------------------------------------------------\n")
+                print("                              ERROR                           \n")
+                print("    El dato ingresado no es un numero > 0, intente de nuevo   \n")
+                print("--------------------------------------------------------------\n") 
+
+
+def ingresoNombreProduc():
+    while True:
+        nombreProc = input("Ingrese el nombre del producto:  ")
+        if validate_words(nombreProc) == True:
+            return nombreProc
+        else:
+            print("No ingreso un nombre, intente de nuevo")
+
+def ingresoFecha():
+    while True:
+        fechCad = input("Ingrese la Fecha de caducidad en dd-mm-yyyy:  ")
+        if validFecha(fechCad) == True:
+            if validFechaActual(fechCad) == False:
+                return fechCad
+            else:
+                print("La fecha del producto ingresado esta cadaducada o caduca el dia de hoy")
+        elif validFecha(fechCad) == False:
+            print("Ingrese una Fecha de caducidad en formato coreecto, intente de nuevo")
+
+def ingresoProduc():
+    producto = list()
+    nombreProduc = ingresoNombreProduc()
+    fechaCad = ingresoFecha()
+    codProduc = generarID()
+    cantProduc =  ingresoCantidad()
+    producto = [codProduc,nombreProduc,fechaCad,cantProduc]
+    mongoUri = "mongodb+srv://usBazurto:contrasenia99@cluster0.js9z1jh.mongodb.net/test"
+    cliente = MongoClient(mongoUri)
+    #Database
+    db = cliente['Inventario']
+    collection = db['Producto']
+    while True:
+        if collection.find({"codProduc":codProduc}) == True:
+            codProduc= generarID()
+        else:
+            break
+    print("Dato Ingresado!!")
+    collection.insert_one({"codProduc":codProduc,"nombreProduc":nombreProduc,"fechaCad":fechaCad,"cantProduc":cantProduc})
+    return producto
+
 
 def opc1():
-    print('Has elegido la opción 1')
-
+    print("Ingreso de productos al inventario")
+    producto = ingresoProduc()
+    print(*producto)
 
 def opc2():
     print('Has elegido la opción 2')
