@@ -14,7 +14,7 @@ from datetime import datetime
 from pymongo import MongoClient
 import random
 import string
-
+import big_o
 def validadorEnteros(num):
     """
     Es un procedimiento que nos determina si un dato ingresado(numero) es un digito
@@ -191,9 +191,10 @@ def ingresoCantidad():
 
 def ingresoNombreProduc():
     while True:
-        nombreProc = input("Ingrese el nombre del producto:  ")
-        if validate_words(nombreProc) == True:
-            return nombreProc
+        nombreProduc = input("Ingrese el nombre del producto:  ")
+        if validate_words(nombreProduc) == True:
+            nombreProduc = nombreProduc.lower()
+            return nombreProduc
         else:
             print("No ingreso un nombre, intente de nuevo")
 
@@ -215,24 +216,45 @@ def ingresoProduc():
     codProduc = generarID()
     cantProduc =  ingresoCantidad()
     producto = [codProduc,nombreProduc,fechaCad,cantProduc]
+    return producto
+
+def imputMongo(producto):
     mongoUri = "mongodb+srv://usBazurto:contrasenia99@cluster0.js9z1jh.mongodb.net/test"
     cliente = MongoClient(mongoUri)
     #Database
     db = cliente['Inventario']
     collection = db['Producto']
     while True:
-        if collection.find({"codProduc":codProduc}) == True:
-            codProduc= generarID()
+        if collection.find({"codProduc":producto[0]}) == True:
+            producto[0]= generarID()
         else:
             break
-    print("Dato Ingresado!!")
-    collection.insert_one({"codProduc":codProduc,"nombreProduc":nombreProduc,"fechaCad":fechaCad,"cantProduc":cantProduc})
-    return producto
+    collection.insert_one({"codProduc":producto[0],"nombreProduc":producto[1],"fechaCad":producto[2],"cantProduc":producto[3]})
 
+def validate_product(product):
+    try:
+        keys = ["codProduc", "nombreProduc", "fechaCad", "cantProduc"]
+        if all(key in product for key in keys):
+            date = datetime.strptime(product["fechaCad"], '%d-%m-%Y')
+            if date > datetime.now():
+                if product["cantProduc"] > 0:
+                    return True
+    except ValueError:
+        return False
+    return False
 
 def opc1():
     print("Ingreso de productos al inventario")
     producto = ingresoProduc()
+    imputMongo(producto)
+    validate_product(producto)
+    print(validate_product(producto))
+    for i in range(len(producto)):
+        #impresion de las cadenas y el caracter sin repetir
+        cadenaPrueba= lambda a:producto[i]
+        #Calculo del tiempo de complejidad de las cadenas creadas
+        best, others = big_o.big_o(validate_product,cadenaPrueba)
+    print(best)
     print(*producto)
 
 def opc2():
