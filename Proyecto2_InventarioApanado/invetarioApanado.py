@@ -12,6 +12,7 @@ VER.1.0.1
 """
 from datetime import datetime
 from pymongo import MongoClient
+from prettytable import PrettyTable
 import random
 import string
 import big_o
@@ -244,10 +245,55 @@ def findMong(codProduc):
     nombreProduc = product["nombreProduc"]
     fechaCad =  product["fechaCad"]
     cantProduc= product["cantProduc"]
-    print("Producto encontradoc con codigo "+ codProduc +" sus datos son: \n")
+    print("Producto encontrado con codigo "+ codProduc +" sus datos son: \n")
     print("Nombre del producto: "+  nombreProduc)
     print("Fecha de caducidad: "+ fechaCad)
     print("Cantindad del Producto: "+ cantProduc)
+
+def updataCantidadProducto(codProduc):
+    mongoUri = "mongodb+srv://usBazurto:contrasenia99@cluster0.js9z1jh.mongodb.net/test"
+    cliente = MongoClient(mongoUri)
+    #Database
+    db = cliente['Inventario']
+    collection = db['Producto']
+    cantProduc =  ingresoCantidad()
+    productActua = collection.update_one({"codProduc":codProduc},{"$set":{"cantProduc":cantProduc}})
+    if productActua.matched_count > 0:
+        print(f"Cantidad actualizada para el producto con ID {codProduc}")
+    else:
+        print("No se encontró el producto especificado")
+
+def deleteMong(codProduc):
+    mongoUri = "mongodb+srv://usBazurto:contrasenia99@cluster0.js9z1jh.mongodb.net/test"
+    cliente = MongoClient(mongoUri)
+    #Database
+    db = cliente['Inventario']
+    collection = db['Producto']
+    
+    productElimado = collection.delete_one({"codProduc":codProduc})
+    if productElimado.deleted_count > 0:
+        print("Producto eliminado exitosamente")
+    else:
+        print("No se encontró el producto especificado")
+
+def printTablaProductos():
+    mongoUri = "mongodb+srv://usBazurto:contrasenia99@cluster0.js9z1jh.mongodb.net/test"
+    cliente = MongoClient(mongoUri)
+    #Database
+    db = cliente['Inventario']
+    collection = db['Producto']
+    table = PrettyTable()
+    products = collection.find()
+    table.field_names = ["Codigo del producto", "Nombre del producto", "Fecha de caducidad", "Cantidad del producto"]
+
+    # Añadimos cada producto a la tabla
+    for product in products:
+        table.add_row([product["codProduc"], product["nombreProduc"], product["fechaCad"], product["cantProduc"]])
+
+    # Imprimimos la tabla
+    print(table)
+    
+
 
 
 
@@ -277,19 +323,25 @@ def opc1():
     print(best)
 
 def opc2():
-    print('Buscar  producto del inventario')
+    print('Buscar producto del inventario')
     codProduc = input("Ingrese el codigo del producto: ")
     findMong(codProduc)
 
 
 def opc3():
-    print('Has elegido la opción 3')
+    print('Actualizar productos')
+    codProduc = input("Ingrese el codigo del producto: ")
+    updataCantidadProducto(codProduc)
+
 
 def opc4():
-    print('Has elegido la opción 4')
+    print('Eliminar  producto del inventario')
+    codProduc = input("Ingrese el codigo del producto: ")
+    deleteMong(codProduc)
 
 def opc5():
     print('Has elegido la opción 5')
+    printTablaProductos()
 
 
 def salir():
