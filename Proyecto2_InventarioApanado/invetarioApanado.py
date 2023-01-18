@@ -209,6 +209,7 @@ def ingresoFecha():
         elif validFecha(fechCad) == False:
             print("Ingrese una Fecha de caducidad en formato coreecto, intente de nuevo")
 
+
 def ingresoProduc():
     producto = list()
     nombreProduc = ingresoNombreProduc()
@@ -225,11 +226,31 @@ def imputMongo(producto):
     db = cliente['Inventario']
     collection = db['Producto']
     while True:
-        if collection.find({"codProduc":producto[0]}) == True:
+        if collection.find_one({"codProduc":producto[0]}) == True:
             producto[0]= generarID()
         else:
             break
     collection.insert_one({"codProduc":producto[0],"nombreProduc":producto[1],"fechaCad":producto[2],"cantProduc":producto[3]})
+
+def findMong(codProduc):
+    mongoUri = "mongodb+srv://usBazurto:contrasenia99@cluster0.js9z1jh.mongodb.net/test"
+    cliente = MongoClient(mongoUri)
+    #Database
+    db = cliente['Inventario']
+    collection = db['Producto']
+    product = collection.find_one({"codProduc":codProduc})
+    print(product)
+    codProduc = product["codProduc"]
+    nombreProduc = product["nombreProduc"]
+    fechaCad =  product["fechaCad"]
+    cantProduc= product["cantProduc"]
+    print("Producto encontradoc con codigo "+ codProduc +" sus datos son: \n")
+    print("Nombre del producto: "+  nombreProduc)
+    print("Fecha de caducidad: "+ fechaCad)
+    print("Cantindad del Producto: "+ cantProduc)
+
+
+
 
 def validate_product(product):
     try:
@@ -248,17 +269,17 @@ def opc1():
     producto = ingresoProduc()
     imputMongo(producto)
     validate_product(producto)
-    print(validate_product(producto))
     for i in range(len(producto)):
         #impresion de las cadenas y el caracter sin repetir
         cadenaPrueba= lambda a:producto[i]
         #Calculo del tiempo de complejidad de las cadenas creadas
         best, others = big_o.big_o(validate_product,cadenaPrueba)
     print(best)
-    print(*producto)
 
 def opc2():
-    print('Has elegido la opción 2')
+    print('Buscar  producto del inventario')
+    codProduc = input("Ingrese el codigo del producto: ")
+    findMong(codProduc)
 
 
 def opc3():
