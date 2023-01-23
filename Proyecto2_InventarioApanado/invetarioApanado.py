@@ -955,7 +955,11 @@ def salir():
 ################################################################################
 
 if __name__ == '__main__':
+    # Mide el tiempo de ejecución al final de la función
     tiempoInicio = time.time()
+    #llama menu principal
     menuPrincipal()
+    # Mide el tiempo de ejecución al final de la función
     tiempoFin = time.time()
+    #imprime tiempo de ejecucion
     print("Tiempo[s] de ejecución del programa: ",round(tiempoFin - tiempoInicio,4))
