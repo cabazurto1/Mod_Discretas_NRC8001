@@ -18,9 +18,7 @@ from pymongo import MongoClient
 from prettytable import PrettyTable
 import random
 import string
-import big_o
 import time
-from memory_profiler import profile
 import sys
 
 #######################################################################################
@@ -389,15 +387,8 @@ def ingresoProduc():
     fechaCad = ingresoFecha()
     # obtiene la cantidad del producto mediante la función ingresoCantidad()
     cantProduc =  ingresoCantidad()
-    # toma el tiempo actual
-    tiempoInicio = time.time()
     # genera un código (ID) para el producto mediante la función generarID()
     codProduc = generarID()
-    # toma el tiempo final
-    tiempoFin = time.time()
-    # imprime el tiempo de ejecución para generar el código (ID) del producto
-    print("Tiempo[s] de ejecución para generar codigo(ID) del producto: ",round(tiempoFin - tiempoInicio,4))
-
     # agrega los datos
     producto = [codProduc,nombreProduc,fechaCad,cantProduc]
     #retorna datos
@@ -433,6 +424,7 @@ def collectionMongoDB():
         print("Error en la conexión a la base de datos.")
         salir()
 
+
 def retornTodosProductosMongoDB():
     # Obtiene la colección 'Producto' mediante la función collectionMongoDB()
     collection = collectionMongoDB()
@@ -463,8 +455,7 @@ def continuarEjecucion():
 #################################################################################
 #Procesos
 #################################################################################
-#Indicar que debe mostrar en consola el uso de memoria para funcion generarID()
-@profile(precision=4)
+
 def generarID():
     """
     La función generarID() se utiliza para generar un código único (ID) para un producto. 
@@ -494,8 +485,7 @@ def generarID():
         #Retorna generarID() para crear otro id valido, usa recursividad
         return generarID()
 
-#Indicar que debe mostrar en consola el uso de memoria para funcion imputMongo(producto)
-@profile(precision=4)
+
 def imputMongo(producto):
     """
     La función imputMongo() se utiliza para agregar un nuevo producto a la base de datos MongoDB. 
@@ -512,8 +502,7 @@ def imputMongo(producto):
     # Utiliza el método 'insert_one()' de la colección para agregar un nuevo documento (producto) con los valores del argumento producto
     collection.insert_one({"codProduc":producto[0],"nombreProduc":producto[1],"fechaCad":producto[2],"cantProduc":producto[3]})
 
-#Indicar que debe mostrar en consola el uso de memoria para funcion findMong(codProduc)
-@profile(precision=4)
+
 def findMong(codProduc):
     """
     Busca y muestra un producto específico en la base de datos MongoD
@@ -540,28 +529,14 @@ def findMong(codProduc):
     listaDatosProductoCad=[product,"3"]
     #llama a una función llamada productoProximoCaducar pasando como parametro la lista
     productoProximoCaducar(listaDatosProductoCad)
-    #crea una función lambda que recibe como parametro la lista y la guarda en una variable
-    listaDatosProductoCad_samples= lambda a:listaDatosProductoCad
-    #Calculo del tiempo de complejidad de las cadenas creadas
-    best, others = big_o.big_o(productoProximoCaducar,listaDatosProductoCad_samples)
-    #imprime tiempo de complejidad para productoProximoCaducar
-    print(best)
-    #LLama a 'notificarStock(cantProduc)' para saber si hay que reponer producto
     notificarStock(cantProduc)
-    #crea una función lambda que recibe como parametro la lista y la guarda en una variable
-    cantProduc_samples= lambda a:cantProduc
-    #Calculo del tiempo de complejidad de las cadenas creadas
-    best2, others = big_o.big_o(notificarStock,cantProduc_samples)
-    #imprime tiempo de complejidad para notificarStock
-    print(best2)
     #imprime datos del producto
     print("Producto encontrado con codigo(ID) "+ codProduc +" sus datos son: \n")
     print("Nombre del producto: "+  nombreProduc)
     print("Fecha de caducidad: "+ fechaCad)
     print("Cantindad del Producto: "+ cantProduc)
   
-#Indicar que debe mostrar en consola el uso de memoria para funcion updataCantidadProducto(codProduc)
-@profile(precision=4)
+
 def updataCantidadProducto(codProduc):
     """
     se utiliza para actualizar la cantidad de un producto específico en la base de datos MongoDB. 
@@ -587,8 +562,7 @@ def updataCantidadProducto(codProduc):
         #imprime "No se encontró el producto especificado"
         print("No se encontró el producto especificado")
 
-#Indicar que debe mostrar en consola el uso de memoria para funcion deleteMong(codProduc)
-@profile(precision=4)
+
 def deleteMong(codProduc):
     """
     se utiliza para eliminar un producto específico de la base de datos MongoDB.
@@ -612,8 +586,6 @@ def deleteMong(codProduc):
 
 
 
-#Indicar que debe mostrar en consola el uso de memoria para funcion printTablaProductos(productos)
-@profile(precision=4)
 def printTablaProductos(productos):
     """
     La función se utiliza para imprimir en consola una tabla con los datos de los productos. 
@@ -638,8 +610,6 @@ def printTablaProductos(productos):
     
 
 
-#Indicar que debe mostrar en consola el uso de memoria para funcion printTablaProductos(productos)
-@profile(precision=4)
 def productoProximoCaducar(listaDatosProductoCad):
     """
     La función notifica que un producto esta por caducar o caduco 
@@ -674,7 +644,7 @@ def productoProximoCaducar(listaDatosProductoCad):
         print("\n--------------------------------------------------------------------------\n")
         print(f"El producto con código {producto['codProduc']} aun no esta proximo a caducar.")
         print("--------------------------------------------------------------------------\n")
-@profile(precision=4)
+
 def notificarStock(cantidad):
     """
     La función notifica que un producto esta por agotarse 
@@ -771,6 +741,7 @@ def menuPrincipal():
             #Imprimir que la opcion no existe
             print("Opcion ingresa no existe, intente de nuevo")
 
+
 def opc1():
     """
     La función opc1 es para ingresar un producto del inventario 
@@ -782,8 +753,6 @@ def opc1():
     ------------
         No Retorna  
     """
-    # Mide el tiempo de ejecución al inicio de la función
-    tiempoInicio = time.time()
     # Imprime una línea de separación y el título de la opción
     print("\n---------------------------------\n")
     print("Ingreso de productos al inventario")
@@ -794,10 +763,6 @@ def opc1():
     imputMongo(producto)
     # Utiliza la función "ValidarProducto" para validar los datos del producto ingresado
     ValidarProducto(producto)
-    # Mide el tiempo de ejecución al final de la función
-    tiempoFin = time.time()
-    # Imprime el tiempo de ejecución en segundos para ingresar el producto
-    print("Tiempo[s] de ejecución para el ingreso del producto: ",round(tiempoFin - tiempoInicio,4))
     # Utiliza la función "continuarEjecucion" para permitir al usuario continuar con la ejecución del programa
     continuarEjecucion()
 
@@ -813,8 +778,6 @@ def opc2():
     ------------
         No Retorna  
     """
-    # Mide el tiempo de ejecución al inicio de la función
-    tiempoInicio = time.time()
     # Imprime una línea de separación y el título de la opción
     print("\n---------------------------------\n")
     print('Buscar producto del inventario')
@@ -823,10 +786,6 @@ def opc2():
     codProduc = ingresoCodProduc()
     #realiza la busqueda del producto y sus datos
     findMong(codProduc)
-    # Mide el tiempo de ejecución al final de la función
-    tiempoFin = time.time()
-    # Imprime el tiempo de ejecución en segundos para buscar el producto
-    print("Tiempo[s] de ejecución para la busqueda del producto: ",round(tiempoFin - tiempoInicio,4))
     # Utiliza la función "continuarEjecucion" para permitir al usuario continuar con la ejecución del programa
     continuarEjecucion()
 
@@ -842,8 +801,6 @@ def opc3():
     ------------
         No Retorna  
     """
-    # Mide el tiempo de ejecución al inicio de la función
-    tiempoInicio = time.time()
     # Imprime una línea de separación y el título de la opción
     print("\n---------------------------------\n")
     print('Actualizar cantidad de un producto')
@@ -860,10 +817,6 @@ def opc3():
     cantProduc= product["cantProduc"]
     #LLama a 'notificarStock(cantProduc)' para saber si hay que reponer producto
     notificarStock(cantProduc)
-    # Mide el tiempo de ejecución al final de la función
-    tiempoFin = time.time()
-    # Imprime el tiempo de ejecución en segundos para actualizar la cantidad del producto
-    print("Tiempo[s] de ejecución para Actualizar cantidad del producto: ",round(tiempoFin - tiempoInicio,4))
     # Utiliza la función "continuarEjecucion" para permitir al usuario continuar con la ejecución del programa
     continuarEjecucion()
 
@@ -879,8 +832,6 @@ def opc4():
     ------------
         No Retorna  
     """
-    # Mide el tiempo de ejecución al inicio de la función
-    tiempoInicio = time.time()
     # Imprime una línea de separación y el título de la opción
     print("\n---------------------------------\n")
     print('Eliminar  producto del inventario')
@@ -889,10 +840,6 @@ def opc4():
     codProduc = input("Ingrese el codigo del producto: ")
     # Utiliza la función "deleteMong" para eliminar el producto con el código especificado de la base de datos
     deleteMong(codProduc)
-    # Mide el tiempo de ejecución al final de la función
-    tiempoFin = time.time()
-    # Imprime el tiempo de ejecución en segundos para eliminar el producto
-    print("Tiempo[s] de ejecución para Eliminar producto: ",round(tiempoFin - tiempoInicio,4))
     # Utiliza la función "continuarEjecucion" para permitir al usuario continuar con la ejecución del programa
     continuarEjecucion()
 
@@ -907,8 +854,6 @@ def opc5():
     ------------
         No Retorna  
     """
-    # Mide el tiempo de ejecución al inicio de la función
-    tiempoInicio = time.time()
     # Imprime una línea de separación y el título del inventario
     print("             -----------------------------------------------\n")
     print('              Inventario de "Los Mega Apanados de la ESPE"')
@@ -917,10 +862,6 @@ def opc5():
     productos = retornTodosProductosMongoDB()
     # Utiliza la función "printTablaProductos" para imprimir la lista de productos en formato de tabla
     printTablaProductos(productos)
-    # Mide el tiempo de ejecución al final de la función
-    tiempoFin = time.time()
-    # Imprime el tiempo de ejecución en segundos para la impresión de la tabla
-    print("Tiempo[s] de ejecución para la impresion de la tabla: ",round(tiempoFin - tiempoInicio,4))
     # Utiliza la función "continuarEjecucion" para permitir al usuario continuar con la ejecución del programa
     continuarEjecucion()
 
@@ -955,7 +896,4 @@ def salir():
 ################################################################################
 
 if __name__ == '__main__':
-    tiempoInicio = time.time()
     menuPrincipal()
-    tiempoFin = time.time()
-    print("Tiempo[s] de ejecución del programa: ",round(tiempoFin - tiempoInicio,4))
