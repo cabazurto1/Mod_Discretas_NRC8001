@@ -276,7 +276,7 @@ def ingresoCantidad():
         Cantidad = input("Ingrese la Cantidad del producto:  ")
         print("\n--------------------------------------------------------------\n")
         #si el dato ingresado es un flotante entonces
-        if validarFloat(Cantidad) == False:
+        if  validadorEnteros(Cantidad) == False:
             #Imprime mensaje de error en ingreso de datos
             print("--------------------------------------------------------------\n")
             print("                              ERROR                           \n")
@@ -284,9 +284,9 @@ def ingresoCantidad():
             print("--------------------------------------------------------------\n") 
         else:
             #si el numero es flotante y >0
-            if float(Cantidad) >= 0:
+            if int(Cantidad) >= 0:
                 #retorna el numero
-                return Cantidad
+                return int(Cantidad)
             else:
                 #Imprime mensaje de error en ingreso de datos
                 print("--------------------------------------------------------------\n")
@@ -312,7 +312,7 @@ def ingresoNombreProduc():
         # pide al usuario ingresar el nombre del producto
         nombreProduc = input("Ingrese el nombre del producto:  ")
         # si el nombre ingresado es válido
-        if validarPalabras(nombreProduc) == True:
+        if validarPalabras(nombreProduc) == True and len(nombreProduc) <= 20:
             # convierte el nombre en minúsculas
             nombreProduc = nombreProduc.lower()
             if validarnombreProducExist(nombreProduc) == True:
@@ -396,7 +396,7 @@ def ingresoProduc():
     # toma el tiempo final
     tiempoFin = time.time()
     # imprime el tiempo de ejecución para generar el código (ID) del producto
-    print("Tiempo[s] de ejecución para generar codigo(ID) del producto: ",round(tiempoFin - tiempoInicio,4))
+    print("Tiempo[2] de ejecución para generar codigo(ID) del producto: ",round(tiempoFin - tiempoInicio,4))
 
     # agrega los datos
     producto = [codProduc,nombreProduc,fechaCad,cantProduc]
@@ -464,7 +464,7 @@ def continuarEjecucion():
 #Procesos
 #################################################################################
 #Indicar que debe mostrar en consola el uso de memoria para funcion generarID()
-@profile(precision=4)
+@profile(precision=2)
 def generarID():
     """
     La función generarID() se utiliza para generar un código único (ID) para un producto. 
@@ -479,7 +479,7 @@ def generarID():
     # Obtiene la colección 'Producto' mediante la función collectionMongoDB()
     collection = collectionMongoDB()
     # Genera un código aleatorio de 5 caracteres alfanuméricos
-    codProduc = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
+    codProduc = ''.join(random.choice(string.ascii_letters + string.digits) for __ in range(5))
     # Busca en la colección si ya existe un producto con el mismo código generado
     producto = collection.find_one({"codProduc": codProduc})
     # Si el producto no existe en la colección
@@ -630,12 +630,12 @@ def printTablaProductos(productos):
     # Creamos  las columnas correspondientes
     table.field_names = ["Codigo del producto", "Nombre del producto", "Fecha de caducidad", "Cantidad del producto"]
     # Recorremos cada producto en la lista de productos
+    
     for product in productos:
-        # Añadimos cada producto a la tabla con los valores correspondientes
+        #Añadimos cada producto a la tabla con los valores correspondientes "codProduc":codProduc
         table.add_row([product["codProduc"], product["nombreProduc"], product["fechaCad"], product["cantProduc"]])
     # Imprimimos la tabla en consola
     print(table)
-    
 
 
 #Indicar que debe mostrar en consola el uso de memoria para funcion printTablaProductos(productos)
@@ -772,6 +772,7 @@ def menuPrincipal():
             print("Opcion ingresa no existe, intente de nuevo")
 
 def opc1():
+    
     """
     La función opc1 es para ingresar un producto del inventario 
     Parametros:
